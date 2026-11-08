@@ -38,7 +38,6 @@
             -webkit-user-select: none;
         }
 
-        /* Ambient Radial Lighting */
         .ambient-bg {
             position: fixed;
             inset: 0;
@@ -65,7 +64,6 @@
             margin: 20px 0;
         }
 
-        /* Diamond Profile Avatar Structure */
         .diamond-wrap {
             position: relative;
             width: 130px;
@@ -101,7 +99,6 @@
             display: block;
         }
 
-        /* Verified Icon Over Avatar */
         .verified-badge {
             position: absolute;
             bottom: -4px;
@@ -147,7 +144,6 @@
             opacity: 0.85;
         }
 
-        /* Value Stack */
         .features-box {
             background: rgba(12, 9, 18, 0.7);
             border: 1px solid rgba(229, 179, 56, 0.18);
@@ -175,7 +171,6 @@
             text-shadow: 0 0 8px rgba(229, 179, 56, 0.6);
         }
 
-        /* Heavy Converting CTA Button */
         .cta-wrap {
             position: relative;
             width: 100%;
@@ -251,7 +246,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Managed By AJ Footer Bar */
         .managed-by-pill {
             margin-top: 28px;
             display: inline-flex;
@@ -287,7 +281,6 @@
             padding: 2px;
         }
 
-        /* In-App Browser Fallback Modal */
         #modal-overlay {
             display: none;
             position: fixed;
@@ -344,15 +337,6 @@
             background: rgba(255, 255, 255, 0.08);
             color: #fff;
         }
-
-        @media (max-height: 650px) {
-            .page-card { padding: 24px 20px 20px; }
-            .diamond-wrap { width: 105px; height: 105px; margin-bottom: 16px; }
-            .channel-name { font-size: 24px; }
-            .features-box { margin-bottom: 18px; padding: 12px 14px; }
-            .cta-btn { padding: 15px 0; font-size: 16px; }
-            .managed-by-pill { margin-top: 18px; }
-        }
     </style>
 </head>
 <body>
@@ -360,7 +344,6 @@
     <div class="ambient-bg"></div>
 
     <div class="page-card">
-        <!-- Diamond Avatar Shape -->
         <div class="diamond-wrap">
             <div class="diamond-frame">
                 <div class="diamond-inner">
@@ -374,7 +357,7 @@
 
         <div class="crown-tag">👑</div>
         <h1 class="channel-name">MARCO TOSS LINE</h1>
-        <div class="sub-counter">78,127 Subscribers · Official Channel</div>
+        <div class="sub-counter">58,127 Subscribers · Official Channel</div>
 
         <div class="features-box">
             <div class="feature-item"><span>⚡</span> 100% Accurate Toss Prediction Reports</div>
@@ -395,7 +378,6 @@
 
         <p class="note-text">Free · Opens Directly in Telegram App</p>
 
-        <!-- Managed By AJ Branding using exact Cyan/Green Geometric Logo[cite: 9] -->
         <a class="managed-by-pill" href="https://t.me/+LlCfsKTU90s1YWI1" target="_blank" rel="noopener">
             <svg class="aj-logo-svg" viewBox="0 0 100 100" fill="none">
                 <defs>
@@ -408,7 +390,6 @@
                         <stop offset="100%" stop-color="#008a3d"/>
                     </linearGradient>
                 </defs>
-                <!-- Forward slant bars & arrow shape from image[cite: 9] -->
                 <polygon points="12,78 34,78 52,22 36,22" fill="url(#ajBlue)"/>
                 <polygon points="28,78 44,78 62,22 48,22" fill="url(#ajBlue)"/>
                 <polygon points="56,18 68,18 88,78 50,66 70,58" fill="url(#ajGreen)"/>
@@ -428,19 +409,32 @@
     </div>
 
     <script>
-        // CORE CONFIGURATION
         const CONFIG = {
             pixelId: "1617291179881122",
             channelSlug: "A4KZPsgaKuZkNGVl",
             webFallback: "https://t.me/+A4KZPsgaKuZkNGVl"
         };
 
-        // 1. ANTI-BOT LAZY PIXEL LOADER
-        // Fires only when real human interaction is verified (FCP / touchstart)
-        let pixelLoaded = false;
-        function initPixelOnHumanEvent() {
-            if (pixelLoaded) return;
-            pixelLoaded = true;
+        const pageLoadTs = Date.now();
+        let pixelActive = false;
+        let humanConfirmed = false;
+
+        // 1. STRICT HUMAN INPUT DETECTOR (No setTimeout fallback)
+        function confirmHumanActivity(e) {
+            // Reject synthetic automated events
+            if (e && e.isTrusted === false) return;
+            humanConfirmed = true;
+            loadPixelOnce();
+        }
+
+        // Only genuine user actions register
+        window.addEventListener('touchstart', confirmHumanActivity, { passive: true, once: true });
+        window.addEventListener('pointerdown', confirmHumanActivity, { passive: true, once: true });
+        window.addEventListener('scroll', confirmHumanActivity, { passive: true, once: true });
+
+        function loadPixelOnce() {
+            if (pixelActive) return;
+            pixelActive = true;
 
             !function(f,b,e,v,n,t,s) {
                 if(f.fbq) return;
@@ -455,34 +449,24 @@
             fbq('track', 'PageView');
         }
 
-        // Attach listeners for genuine human touch
-        document.addEventListener('touchstart', initPixelOnHumanEvent, { passive: true, once: true });
-        document.addEventListener('pointerdown', initPixelOnHumanEvent, { passive: true, once: true });
-        setTimeout(initPixelOnHumanEvent, 1600);
-
-        // 2. URL SCRUBBER (Cleans ad tokens & fbclid to stop crawler scraping)
-        (function cleanParameters() {
+        // 2. RUNTIME PARAMETER STRIPPING (Prevents crawler signature indexing)
+        (function scrubParams() {
             try {
                 if (!window.history || !history.replaceState || !window.URL) return;
-                const currentUrl = new URL(window.location.href);
-                const blacklistedParams = [
-                    "utm_source", "utm_medium", "utm_campaign", "utm_term",
-                    "utm_content", "fbclid", "gclid", "ad_id", "campaign_id", "adset_id"
-                ];
-                let modified = false;
-                blacklistedParams.forEach(p => {
-                    if (currentUrl.searchParams.has(p)) {
-                        currentUrl.searchParams.delete(p);
-                        modified = true;
+                const u = new URL(window.location.href);
+                const stripList = ["utm_source","utm_medium","utm_campaign","utm_term","utm_content","fbclid","gclid","ad_id","campaign_id","adset_id"];
+                let touched = false;
+                stripList.forEach(k => {
+                    if (u.searchParams.has(k)) {
+                        u.searchParams.delete(k);
+                        touched = true;
                     }
                 });
-                if (modified) {
-                    history.replaceState(null, document.title, currentUrl.pathname + currentUrl.hash);
-                }
-            } catch (e) {}
+                if (touched) history.replaceState(null, document.title, u.pathname + u.hash);
+            } catch(e) {}
         })();
 
-        // 3. DIRECT TELEGRAM DEEP LINKING (App Handoff with Blur / Visibility Fallback)
+        // 3. SECURE CTA HANDLER
         const joinBtn = document.getElementById('join-btn');
         const overlay = document.getElementById('modal-overlay');
         const modalAppLink = document.getElementById('modal-app-link');
@@ -491,11 +475,20 @@
         joinBtn.addEventListener('click', function(e) {
             e.preventDefault();
 
-            // Fire standard Subscribe event
-            if (typeof fbq === 'function') {
-                fbq('track', 'Subscribe');
-            } else {
-                new Image().src = `https://www.facebook.com/tr?id=${CONFIG.pixelId}&ev=Subscribe&noscript=1`;
+            // Guard 1: Must be a trusted browser event (not scripted via .click())
+            if (!e.isTrusted) return;
+
+            // Guard 2: Dwell-time check (Must be at least 800ms on-page)
+            const dwellTime = Date.now() - pageLoadTs;
+            const validHumanClick = dwellTime >= 800 && humanConfirmed;
+
+            // Only send conversion to Meta if genuine human criteria passed
+            if (validHumanClick) {
+                if (typeof fbq === 'function') {
+                    fbq('track', 'Subscribe');
+                } else {
+                    new Image().src = `https://www.facebook.com/tr?id=${CONFIG.pixelId}&ev=Subscribe&noscript=1`;
+                }
             }
 
             const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -505,19 +498,15 @@
                 const clickTime = Date.now();
                 let switchedAway = false;
 
-                const onVisibilityChange = function() {
-                    if (document.hidden) {
-                        switchedAway = true;
-                    }
+                const onVis = function() {
+                    if (document.hidden) switchedAway = true;
                 };
-                document.addEventListener('visibilitychange', onVisibilityChange, { once: true });
+                document.addEventListener('visibilitychange', onVis, { once: true });
 
-                // Launch directly into native Telegram app
                 window.location.href = tgAppProtocol;
 
-                // Fallback: If device stays on browser, display modal
                 setTimeout(() => {
-                    document.removeEventListener('visibilitychange', onVisibilityChange);
+                    document.removeEventListener('visibilitychange', onVis);
                     if (!switchedAway && !document.hidden && (Date.now() - clickTime < 3500)) {
                         modalAppLink.href = CONFIG.webFallback;
                         overlay.style.display = 'flex';
@@ -538,9 +527,7 @@
         });
 
         overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                overlay.style.display = 'none';
-            }
+            if (e.target === overlay) overlay.style.display = 'none';
         });
     </script>
 </body>
